@@ -1,0 +1,6 @@
+# creating the mongodb service by using the ansible-plabook-roles
+- name: setup the mongodb server
+  hosts: mongodb
+  become: yes
+  roles:
+  - mongodb

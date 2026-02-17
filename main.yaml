@@ -1,0 +1,7 @@
+# Here i' creatinh a component to pass the service names as variables and then i will call the component in the main.yaml file to create the services.
+- name: setup the {{ component }} service
+  hosts: "{{ component }}"
+  become: yes
+  roles:
+  - "{{ component }}"
+  
