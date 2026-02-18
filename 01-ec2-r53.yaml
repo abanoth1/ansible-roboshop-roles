@@ -1,0 +1,64 @@
+# I'm creating the Ec2 and R53 playbook here
+# This playbook will create an EC2 instance and a Route 53 record for the instance
+- name: create ec2 and R53
+  hosts: localhost
+  connection: local
+  vars:
+    ami_id:  ami-0220d79f3f480ecf5 # Replace with the actual AMI ID for your region
+    sg_id:  sg-0ca84109ed7b2fd6a   # Replace with the actual security group ID that allows SSH access
+    zone_id: Z0643845MTWJNN2ZJCER  # Zone ID for the Route 53 hosted zone where you want to create the record and it will remain constant for all the records
+    domain_name: "daws86s.me"      # daws86s.me is the domain name that i registered in route 53 and i'm using it to create the records for the ec2 instances that i will create in this playbook
+    instances:
+     - mongodb
+     - redis
+     - mysql
+     - rabbitmq
+  tasks:
+  - name: create ec2 instance
+    amazon.aws.ec2_instance:
+      name: "{{ item }}"
+      instance_type: t3.micro
+      security_group: "{{ sg_id }}"
+      image_id: "{{ ami_id }}"
+      tags:
+        name: "{{ item }}"
+    loop: "{{ instances }}"
+    register: ec2_output       # ec2_output variable will store the output of the ec2_instance module which contains the details of the created instance including the public IP address
+
+  # - name: print the ec2 output
+  #   ansible.builtin.debug:
+  #     msg: "{{ ec2_output }}"
+
+  # - name: print the public_ip of the created instance
+  #   ansible.builtin.debug:
+  #     msg: "{{ item.instances[0].public_ip_address }}" # Accessing the public IP address of the created instance from the ec2_output variable
+  #   loop: "{{ ec2_output.results }}" 
+
+  # - name: print the private_ip of the created instance
+  #   ansible.builtin.debug:
+  #     msg: "{{ item.instances[0].private_ip_address }}" # Accessing the private IP address of the created instance from the ec2_output variable
+  #   loop: "{{ ec2_output.results }}"
+
+  - name: create route 53 record for the created instance
+    amazon.aws.route53:
+      state: present
+      zone: "{{ domain_name }}"
+      record: "{{ item.item }}.{{ domain_name }}" # Creating a record for the instance using the instance name and the domain name mongodb.daws86s.me
+      type: A
+      ttl: 1
+      value: "{{ item.instances[0].public_ip_address }}" # Using the public IP address of the created instance as the value for the A record in Route 53
+      overwrite: yes
+    loop: "{{ ec2_output.results }}"
+
+# ceatingt the route 53 record for the frontend instance to access it using the domain name daws86s.me instead of the public IP address of the instance
+  - name: creating the route 53 record for the frontend
+    amazon.aws.route53:
+      state: present
+      zone: "{{ domain_name}}"
+      record: "{{ domain_name }}" # domain is daws86s.me 
+      type: A
+      ttl: 1
+      value: "{{ item.instances[0].public_ip_address }}"
+      overwrite: yes
+    when: item.item == "frontend"
+    loop: "{{ ec2_output.results }}"
