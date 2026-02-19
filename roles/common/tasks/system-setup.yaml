@@ -5,7 +5,7 @@
     dest: "/etc/systemd/system/{{ component }}.service"
   notify: daemon reload
 
-- name: start the service
+- name: start the service # here i am starting the service and enabling it to start on boot.
   ansible.builtin.service:
     name: "{{ component }}"
     state: restarted
