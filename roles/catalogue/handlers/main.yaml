@@ -1,0 +1,5 @@
+# this yaml files is useful to notify the handlers for the catalogue service and to restart the catalogue service.
+
+- name: daemon reload # systemctl daemon-reload
+  ansible.builtin.systemd_service:
+    daemon_reload: true
