@@ -1,0 +1,3 @@
+dependencies:
+  - role: common
+# this yaml file is useful to define the dependencies for the catalogue service and to call the common role for the catalogue service.
