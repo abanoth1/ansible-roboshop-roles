@@ -1,0 +1,2 @@
+# this main.yaml file is useful for the variables for the catalogue service and to import the tasks for the catalogue service.
+MONGODB_HOST: "mongodb.daws86s.me" 
