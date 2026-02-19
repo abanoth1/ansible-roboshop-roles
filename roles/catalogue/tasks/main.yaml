@@ -1,0 +1,6 @@
+# this yaml file is useful to import the tasks for the catalogue service and to create the catalogue service.
+- name: app setup
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: app-setup.yaml
+# here i am using the import_role module to import the tasks from the common role
