@@ -1,14 +1,35 @@
 # Created the tasks file for mysql role and added the tasks for installing the mysql server and setting up the root password.
-- name: install mysql server
-  ansible.builtin.package:
-    name: mysql-server
-    state: present
+# - name: install mysql server
+#   ansible.builtin.package:
+#     name: mysql-server
+#     state: present
 
-- name: start and enable mysql
-  ansible.builtin.service:
-    name: mysqld
-    state: started
-    enabled: yes
+# - name: start and enable mysql
+#   ansible.builtin.service:
+#     name: mysqld
+#     state: started
+#     enabled: yes
 
-- name: setup root password
-  ansible.builtin.command: mysql_secure_installation --set-root-pass {{ MYSQL_ROOT_PASSWORD }}
+# - name: setup root password
+#   ansible.builtin.command: mysql_secure_installation --set-root-pass {{ MYSQL_ROOT_PASSWORD }}
+
+
+
+  # Creating the mysql service by using the ansible playbook 
+- name: creating the mysql server
+  hosts: mysql
+  become: yes
+  tasks:
+    - name: install mysql server
+      ansible.builtin.package:
+        name: mysql-server
+        state: present
+
+    - name: start and enable the mysql server
+      ansible.builtin.service:
+        name: mysqld
+        state: started
+        enabled: yes
+
+    - name: setting up the root password for mysql
+      ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1
